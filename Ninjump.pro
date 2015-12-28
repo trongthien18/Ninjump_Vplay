@@ -41,3 +41,9 @@ win32 {
 macx {
     ICON = macx/app_icon.icns
 }
+
+DISTFILES += \
+    qml/Shuriken.qml \
+    qml/scenes/GameOverScene.qml \
+    qml/common/MenuImageButton.qml \
+    qml/common/AudioManager.qml

@@ -37,7 +37,7 @@ EntityBase {
      id: animation
      target: parent
      property: "y"
-     velocity: 150
+     velocity: 220
      running: true
    }
 

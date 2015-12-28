@@ -24,9 +24,10 @@ SceneBase {
 
     // credits
     Text {
-        text: "Developer: Trong Thien Le"
+        text: "Developed by Trong Thien Le"
         color: "white"
         anchors.centerIn: parent
+        font.pixelSize: 20
     }
 }
 

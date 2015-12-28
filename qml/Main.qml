@@ -1,6 +1,7 @@
 import VPlay 2.0
 import QtQuick 2.0
 import "scenes"
+import "common"
 
 GameWindow {
     id: window
@@ -19,14 +20,27 @@ GameWindow {
         id: entityManager
     }
 
+    // global music and sound management
+    AudioManager {
+      id: audioManager
+    }
+
     // menu scene
     MenuScene {
         id: menuScene
         // listen to the button signals of the scene and change the state according to it
-        onPlayPressed: window.state = "game"
-        onCreditsPressed: window.state = "credits"
+        onPlayPressed: {
+            audioManager.play(audioManager.idClick)
+            gameScene.resetGame()
+            window.state = "game"
+        }
+        onCreditsPressed: {
+            audioManager.play(audioManager.idClick)
+            window.state = "credits"
+        }
         // the menu scene is our start scene, so if back is pressed there we ask the user if he wants to quit the application
         onBackButtonPressed: {
+            audioManager.play(audioManager.idClick)
             nativeUtils.displayMessageBox(qsTr("Really quit the game?"), "", 2);
         }
         // listen to the return value of the MessageBox
@@ -43,13 +57,32 @@ GameWindow {
     // credits scene
     CreditsScene {
         id: creditsScene
-        onBackButtonPressed: window.state = "menu"
+        onBackButtonPressed: {
+            audioManager.play(audioManager.idClick)
+            window.state = "menu"
+        }
     }
 
     // game scene to play a level
     GameScene {
         id: gameScene
-        onBackButtonPressed: window.state = "menu"
+        onBackButtonPressed: {
+            audioManager.play(audioManager.idClick)
+            window.state = "menu"
+        }
+    }
+
+    GameOverScene {
+        id: gameOverScene
+        onBackButtonPressed: {
+            audioManager.play(audioManager.idClick)
+            window.state = "menu"
+        }
+        onReplay: {
+            audioManager.play(audioManager.idClick)
+            window.state = "game"
+            gameScene.resetGame()
+        }
     }
 
     // menuScene is our first scene, so set the state to menu initially
@@ -62,6 +95,11 @@ GameWindow {
             name: "menu"
             PropertyChanges {target: menuScene; opacity: 1}
             PropertyChanges {target: window; activeScene: menuScene}
+            StateChangeScript {
+              script: {
+                audioManager.playMusic(audioManager.idMusicBGMenu)
+              }
+            }
         },        
         State {
             name: "credits"
@@ -72,7 +110,23 @@ GameWindow {
             name: "game"
             PropertyChanges {target: gameScene; opacity: 1}
             PropertyChanges {target: window; activeScene: gameScene}
+            StateChangeScript {
+              script: {
+                audioManager.playMusic(audioManager.idMusicBGGame)
+              }
+            }
+        },
+        State {
+            name: "gameOver"
+            PropertyChanges {target: gameOverScene; opacity: 1}
+            PropertyChanges {target: window; activeScene: gameOverScene}
+            StateChangeScript {
+              script: {
+                audioManager.playMusic(audioManager.idMusicBGMenu)
+              }
+            }
         }
+
     ]
 }
 

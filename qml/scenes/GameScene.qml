@@ -5,7 +5,9 @@ import "../"
 
 SceneBase {
     id:gameScene
+
     enabled: invisible
+    property int totalScore: ninja.totalScore
 
     PhysicsWorld {
         id: physicWorld
@@ -25,7 +27,10 @@ SceneBase {
         id: ninja
         x: 200
         y: 300
-    }
+        onDie: {
+            window.state = "gameOver"
+        }
+    }   
 
     Ground {
         id: leftGround1
@@ -49,6 +54,18 @@ SceneBase {
         y: -gameScene.height
     }
 
+    Shuriken {
+        id: shuriken1
+        x: gameScene.width * 0.5
+        y: -100
+    }
+
+    Shuriken {
+        id: shuriken2
+        x: gameScene.width * 0.5
+        y: -gameScene.height * 0.5 - 100
+    }
+
     MouseArea {
       anchors.fill: gameScene.gameWindowAnchorItem
       onPressed: {
@@ -67,6 +84,23 @@ SceneBase {
         onClicked: {
             backButtonPressed()
         }
+    }
+
+    Text {
+      id: scoreText
+      x: 0
+      y: 10
+      text: "Score: " + ninja.totalScore
+      font.pixelSize: 20
+      color: "#ffffff"
+    }
+
+    function resetGame() {
+        ninja.reset()
+        shuriken1.reset()
+        shuriken2.reset()
+        shuriken2.y = -gameScene.height * 0.5 - 100
+        totalScore = 0
     }
 }
 

@@ -18,6 +18,8 @@ Rectangle {
     // access the text of the Text component
     property alias text: buttonText.text
 
+    property string source: ""
+
     // this handler is called when the button is clicked.
     signal clicked
 
@@ -26,6 +28,11 @@ Rectangle {
         anchors.centerIn: parent
         font.pixelSize: 18
         color: "black"
+    }
+
+    Image {
+        id: image
+        source: source
     }
 
     MouseArea {

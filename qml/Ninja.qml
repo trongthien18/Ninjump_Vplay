@@ -7,9 +7,13 @@ EntityBase {
     entityType: "Ninja"
     state: isJumping === true ? "jump" : "run"
 
+    signal die
+
     property int currentWidth: 40
     property int currentHeight: 40
     property bool isJumping: false
+    property bool isDie: false
+    property int totalScore: 0
 
     SpriteSequenceVPlay {
         id: ninjaAnimation
@@ -56,10 +60,21 @@ EntityBase {
     onStateChanged: {
         if (ninjaEntity.state == "run") {
             ninjaAnimation.jumpTo("run")
+            audioManager.play(audioManager.idFoodStep)
         }
 
         if (ninjaEntity.state == "jump") {
             ninjaAnimation.jumpTo("jump")
+        }
+    }
+
+    onYChanged: {
+        if (ninjaEntity.y > gameScene.height * 0.9) {
+            if (!isDie) {
+                console.log(ninjaEntity.y)
+                die()
+                isDie = true
+            }
         }
     }
 
@@ -75,15 +90,25 @@ EntityBase {
       gravityScale: 1
 
       fixture.onBeginContact: {
-          if (isJumping === true) {
-              state = "run"
-              isJumping = false
+          var fixture = other;
+          var body = fixture.getBody();
+          var collidedEntity = body.target;
+          var collidedEntityType = collidedEntity.entityType;
+          if(collidedEntityType === "Ground") {
+              if (isJumping === true) {
+                  state = "run"
+                  isJumping = false
 
-              if (ninjaEntity.x < gameScene.width * 0.5) {
-                  ninjaAnimation.state = "normal"
-              } else {
-                  ninjaAnimation.state = "flip"
+                  if (ninjaEntity.x < gameScene.width * 0.5) {
+                      ninjaAnimation.state = "normal"
+                  } else {
+                      ninjaAnimation.state = "flip"
+                  }
               }
+          }
+          else if (collidedEntityType === "Shuriken") {
+              audioManager.play(audioManager.idFail)
+              gameOver()
           }
       }
     }
@@ -93,6 +118,10 @@ EntityBase {
     function jump() {
         if (isJumping === false) {
             isJumping = true
+            totalScore ++
+            gameScene.totalScore++
+
+            audioManager.play(audioManager.idJump)
 
             ninjaAnimation.state = "normal"
 
@@ -104,5 +133,19 @@ EntityBase {
                 ninjaCollider.gravityScale = 1
             }
         }
+    }
+
+    function gameOver() {
+        ninjaCollider.gravityScale = 0
+        ninjaCollider.body.linearVelocity = Qt.point(0, 300)
+    }
+
+    function reset() {
+        x = 200
+        y = 300
+        isDie = false
+         ninjaCollider.body.linearVelocity = Qt.point(0, 0)
+        ninjaCollider.gravityScale = 1
+        totalScore = 0
     }
 }

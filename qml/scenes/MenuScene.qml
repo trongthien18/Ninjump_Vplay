@@ -34,7 +34,10 @@ SceneBase {
         spacing: 10
         MenuButton {
             text: "Play"
-            onClicked: playPressed()
+            onClicked: {
+                audioManager.play(audioManager.idClick)
+                playPressed()
+            }
         }
         MenuButton {
             text: "Credits"
